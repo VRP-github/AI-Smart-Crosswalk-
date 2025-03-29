@@ -5,14 +5,13 @@ import contextlib
 import time
 from ultralytics import YOLO
 
-# Suppress YOLO logs
 os.environ['YOLO_VERBOSE'] = '0'
 
 # Get command-line arguments
 if len(sys.argv) > 1:
     VIDEO_FILE = sys.argv[1] if sys.argv[1] != "cam" else None
 else:
-    VIDEO_FILE = None  # Default to webcam if no argument is provided
+    VIDEO_FILE = None  # If no video file given, takes input from webcam
 
 USE_WEBCAM = VIDEO_FILE is None  
 
@@ -25,8 +24,9 @@ if not cap.isOpened():
 cap.set(cv2.CAP_PROP_FPS, 30)  # Set a stable FPS to ensure the camera feed is continuous
 frame_width = int(cap.get(3))
 frame_height = int(cap.get(4))
-resize_width = 640  # Adjust based on your needs
-resize_height = 480  # Adjust based on your needs
+# Media player window size
+resize_width = 640  
+resize_height = 480  
 if frame_width > 0:
     resize_height = int((resize_width / frame_width) * frame_height)
 
@@ -98,15 +98,14 @@ def predict_and_detect(chosen_model, img, classes=[], conf=0.5):
         if light_status == "Red":
             light_status = "Yellow"
             pedestrian_detected_time = 0
-            signal_cnt = 1  
+            signal_cnt = 1  # Set signal_cnt to 1 when light turns Yellow
     if pedestrian_detected_time > 30:
         if light_status == "Yellow":
             light_status = "Green"
-            signal_cnt = 1
 
     if no_pedestrian_time > 20:
         light_status = "Red"
-        signal_cnt = 0  
+        signal_cnt = 0  # Reset signal_cnt to 0 when light turns Red
 
     return img, results, signal_cnt
 
